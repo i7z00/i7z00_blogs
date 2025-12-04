@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I7z00 Personal Blog</title>
+    <!-- JetBrains Mono: Stylish, readable coding font (with fallback) -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #81A5FF;
+            --accent-hover: #5987fa;
+            --bg: #151c26;
+            --white: #23293b;
+            --text-main: #e5e8ef;
+            --text-secondary: #939ac9;
+            --border: #222543;
+            --radius: 16px;
+            --shadow: 0 2px 24px 0 rgba(30,45,80,0.14), 0 1.5px 8px 0 rgba(23,34,63,0.15);
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'Consolas', monospace;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            letter-spacing: 0.02em;
+        }
+        header {
+            width: 100%;
+            margin-top: 32px;
+            margin-bottom: 32px;
+            padding: 0 24px 12px 24px;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            border-radius: var(--radius) var(--radius) 0 0;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            justify-content: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--accent-hover);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            padding: 12px 0;
+        }
+        main {
+            width: 100%;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            border-radius: 0 0 var(--radius) var(--radius);
+            padding: 32px 24px 40px 24px;
+            box-sizing: border-box;
+        }
+        ul.blog-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        ul.blog-list li {
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            padding: 18px 15px;
+            border-radius: 10px;
+            background: #192233;
+            transition: background 0.15s, border 0.18s;
+            box-shadow: 0 2px 8px 0 rgba(68,108,252,0.04);
+        }
+        ul.blog-list li:hover {
+            background: #1e2b42;
+            border: 1px solid var(--accent-hover);
+        }
+        ul.blog-list a {
+            text-decoration: none;
+            color: var(--accent);
+            font-size: 1.22rem;
+            font-weight: 600;
+            transition: color 0.16s, border-bottom 0.18s;
+            border-bottom: 1.5px solid #2447a9;
+            border-radius: 4px;
+        }
+        ul.blog-list a:hover {
+            color: var(--accent-hover);
+            border-bottom: 1.5px solid var(--accent-hover);
+        }
+        @media (max-width: 760px) {
+            header, main {
+                max-width: 98%;
+                padding: 12px;
+                font-size: 1.02em;
+            }
+            main { padding-top: 20px; padding-bottom: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>I7z00 Personal Blog</h1>
+    </header>
+    <main>
+        <ul class="blog-list">
+            <li>
+                <a href="posts.html?id=blog_1.md">
+                  1-click organization takeover chaining cspt with open redirect
+                </a>
+            </li>
+        </ul>
+    </main>
+</body>
+</html>

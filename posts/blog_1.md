@@ -23,11 +23,11 @@ And it worked!
 
 One of the application functionalities allows you to integrate third-party websites. it asks you to add the **Tenant Name** (directly appended to the third-party tenant's domain) and then authenticate to the tenant.
 
-![image](../images/image.png)
+![image](/i7z00_blogs/images/image.png)
 
 In the tenant name field, I tried adding special characters like (`/ ? " '`) and the application accepted it! I tried testing for other types of bugs like XSS and SSRF, but nothing worked. However, I found that I could manipulate the path.
 
-![image](../images/image%20copy.png)
+![image](/i7z00_blogs/images/image%20copy.png)
 
 Like that, I can add my own domain(plus path) as a tenant! In the next step for adding the integration,I tried adding `https://hacker.com/exploit?`and it worked adding the rest of the domain name to url query. after that the application asks you to verify authentication. Clicking the verify authentication button redirects you to your tenant in this case, it redirects to my own website!! The open redirect endpoint looked something like this:
 
@@ -45,7 +45,7 @@ After finding the open redirect, I could now control the response of the webpage
 
 I copied the original JSON response, hosted it on my own server, and played with it, but nothing showed up. I checked the console and found this error:
 
-![image](../images/image%20copy%202.png)
+![image](/i7z00_blogs/images/image%20copy%202.png)
 
 Debugging using the dev tools, it turned out that this piece of code broke because of my JSON response. It expects an Array, but after investigation, it turned out that the CSPT manipulated another request that should return an Array, but now it is returning my JSON object instead.
 
@@ -93,7 +93,7 @@ While reading the question types and their descriptions, I found that one of the
 
 So I copied the question JSON and injected `<img src=x onerror=alert(document.domain)>` in the question answer field and popped the XSS!!
 
-![image](../images/image%20copy%203.png)
+![image](/i7z00_blogs/images/image%20copy%203.png)
 
 
 ## Escaltion To organization takeover
@@ -123,7 +123,7 @@ The exploit creates a form with two input elements, then steals the CSRF token v
 
 here is a high level overview of the expolit steps:
 
-![image](../images/image%20copy%204.png)
+![image](/i7z00_blogs/images/image%20copy%204.png)
 ## More Stuff to Read About CSPT: 
 
 - https://vitorfalcao.com/posts/hacking-high-profile-targets/

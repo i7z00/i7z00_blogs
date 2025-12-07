@@ -19,9 +19,11 @@
         }
         html, body {
             height: 100%;
+            min-height: 100%;
         }
         body {
             min-height: 100vh;
+            min-height: 100dvh;
             background: var(--bg);
             color: var(--text-main);
             font-family: 'JetBrains Mono', 'Fira Mono', 'Menlo', 'Consolas', monospace;
@@ -31,6 +33,7 @@
             flex-direction: column;
             align-items: center;
             letter-spacing: 0.02em;
+            min-height: 100vh;
         }
 
         header {
@@ -65,13 +68,15 @@
 
         #content {
             width: 100%;
-            min-height: 450px;
-            margin: 0;
-            background: var(--white);
+            max-width: 900px;
+            min-height: calc(100vh - 96px - 3.5rem); /* header (32+32+12=76 + some gap ~20 = 96px) + margin-bottom */
             box-shadow: var(--shadow);
             border-radius: 0 0 var(--radius) var(--radius);
-            padding: 32px 24px 40px 24px;
+            padding: 40px 32px 56px 32px;
             box-sizing: border-box;
+            display: block;
+            flex: 1 1 auto;
+            margin: 0 auto 3.5rem auto;
         }
 
         #content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
@@ -80,9 +85,9 @@
             line-height: 1.2;
             margin: 2.2em 0 1em 0;
         }
-        #content h1 { font-size: 2rem; margin-top: 0; }
-        #content h2 { font-size: 1.36rem; }
-        #content h3 { font-size: 1.18rem; }
+        #content h1 { font-size: 1.7rem; margin-top: 0; }
+        #content h2 { font-size: 1.2rem; }
+        #content h3 { font-size: 0.9rem; }
 
         #content p {
             margin-top: 1em;
@@ -90,7 +95,7 @@
             color: var(--text-main);
         }
         #content ul, #content ol {
-            margin: 1em 0 1em 2em;
+            margin: 1em 50rem;
         }
         #content li {
             margin-bottom: 0.35em;
@@ -117,6 +122,10 @@
         }
         #content pre, #content code {
             font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+        }
+        .container {
+        border: 1px solid white;
+        border-radius: 5px;
         }
         #content pre {
             background: #29345a;
@@ -165,7 +174,9 @@
     <header>
         <a href="index.html">← Back to Home</a>
     </header>
+    <div class="container">
     <div id="content">Loading post...</div>
+    </div>
     <script>
         const params = new URLSearchParams(window.location.search);
         const file = params.get('id');
